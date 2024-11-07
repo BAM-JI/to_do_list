@@ -1,95 +1,155 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client"
+//componente funcional
 
-export default function Home() {
+//funcion anonima
+//Funcion flecha
+//funcion de expresion
+//funcion de asignacion
+//IIEF(inmediately Invoked Function Expression)
+//Funcion de expresion invocada inmediata
+
+//funcion de expresion
+import styles from "./page.module.css"
+import { useState } from "react"
+export default function Page() {
+
+  const [tareas, setTareas] = useState([]);
+  const [filtroTexto, setFiltroTexto] = useState("");
+  const[filtroPrioridad,setFiltroPrioridad] = useState("");
+
+
+  const [nuevaTarea, setNuevaTarea] = useState({
+    nombre: "",
+    fecha: "",
+    prioridad: ""
+  })
+  function handleChange(event) {
+    setNuevaTarea({
+      ...nuevaTarea,
+      [event.target.name]: event.target.value
+    })
+  }
+
+  function handleChangeSearchTexto(event) {
+    setFiltroTexto(event.target.value)
+  }
+
+  function handleChangeSearchPrioridad(event) {
+    setFiltroPrioridad(event.target.value);
+  }
+
+  function agregarTarea() {
+    const newListaTareas = tareas.slice();
+    const tareaNueva = {
+      nombre: nuevaTarea.nombre,
+      fecha: nuevaTarea.fecha,
+      prioridad: nuevaTarea.prioridad,
+      creadoEl: new Date().toISOString()
+    }
+    newListaTareas.push(tareaNueva);
+    setTareas(newListaTareas);
+
+    setNuevaTarea(newListaTareas);
+    setNuevaTarea({
+      nombre: "",
+      fecha: "",
+      prioridad: ""
+    })
+  }
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.js</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className={styles.container}>
+      <div className={styles.box}>
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
+        <h1>todo-list</h1>
+        <input value={nuevaTarea.nombre}
+          onChange={handleChange}
+          type="text" placeholder="Agregar tarea.."
+          name="nombre" />
+        <input type="date"
+          name="fecha"
+          onChange={handleChange}
+          value={nuevaTarea.fecha}
+        />
+        <select
+          name="prioridad"
+          onChange={handleChange}
+          value={nuevaTarea.prioridad}>
+          <option value={""}>Prioridad</option>
+          <option value={"alta"}>Alta</option>
+          <option value={"media"}>Media</option>
+          <option value={"baja"}>Baja</option>
+        </select>
+        <button onClick={agregarTarea}>Agregar</button>
+
+        <div
+          style={{
+            marginTop: "20px",
+          }}
+        >
+          <h4>Filtros</h4>
+          <input type="text" placeholder="Buscar tarea..."
+            className={styles.busqueda}
+            onChange={handleChangeSearchTexto}
+            value={filtroTexto} />
+
+          <div>
+            <p>Ordenar por PRIORIDAD</p>
+            <select className={styles.busqueda}
+            onChange={handleChangeSearchPrioridad}
+              value={filtroPrioridad}>
+              <option value="">Prioridad</option>
+              <option value="alta">Alta</option>
+              <option value="media">Media</option>
+              <option value="baja">Baja</option>
+            </select>
+
+          </div>
         </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        <div style={{
+          marginTop: "20px",
+
+        }}>
+          <ul>
+            {
+              tareas
+                .filter((tarea) => tarea.nombre.toLowerCase().includes(filtroTexto.toLowerCase()
+                ))
+                .filter(
+                  (tarea)=>{
+                    if(filtroPrioridad === ""){
+                      return true;
+                    }
+                    return tarea.prioridad === filtroPrioridad;
+                  }
+                )
+                .map(
+                  (tarea) => {
+                    return (
+                      <li className={styles.tarea} >
+                        <h6>{tarea.nombre}</h6>
+                        <p>{tarea.fecha}</p>
+                        <p>{tarea.date}</p>
+                      </li>
+                    )
+                  }//callback
+                )
+            }
+          </ul>
+        </div>
+
+      </div>
     </div>
-  );
+  )
 }
+
+//CSS:
+//estilos en clase
+//estilos por id 
+//estlos en linea
+//estilos por etiqueta 
+//orden de procedencia de los estilos:
+//estilos en linea
+//estilos por id
+//estilos en etiqueta
+//estilos por clase
